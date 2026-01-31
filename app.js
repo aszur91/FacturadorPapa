@@ -1,5 +1,5 @@
 let facturaActual = null;
-
+alert('funciona')
 function generarFactura() {
   const cantidad = Number(cantidadInput.value);
   const precio = Number(precioInput.value);
