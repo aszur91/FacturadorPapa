@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>App de Facturación</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+  <header>
+    <h1>Facturación</h1>
+    <label for="empresaActiva">Empresa activa:</label>
+    <select id="empresaActiva" aria-label="Selecciona la empresa activa">
+      <!-- Opciones generadas dinámicamente -->
+    </select>
+  </header>
+
+  <nav id="menuPrincipal">
+    <button id="btnEmpresas" aria-label="Ir a pantalla Empresas">Empresas</button>
+    <button id="btnClientes" aria-label="Ir a pantalla Clientes">Clientes</button>
+    <button id="btnPresupuestos" aria-label="Ir a pantalla Presupuestos">Presupuestos</button>
+    <button id="btnFacturas" aria-label="Ir a pantalla Facturas">Facturas</button>
+    <button id="btnAjustes" aria-label="Ir a pantalla Ajustes">Ajustes</button>
+  </nav>
+
+  <main id="pantallas">
+
+    <!-- PANTALLA: EMPRESAS -->
+    <section id="pantallaEmpresas" class="pantalla">
+      <h2>Empresas</h2>
+      <button id="btnAddEmpresa" aria-label="Añadir nueva empresa">Añadir empresa</button>
+      <ul id="listaEmpresas" aria-label="Lista de empresas">
+        <!-- Empresas se agregan dinámicamente -->
+      </ul>
+      <div id="formEmpresaContainer" class="formulario">
+        <h3 id="formEmpresaTitulo">Nueva Empresa</h3>
+        <form id="formEmpresa">
+          <label for="empresaNombre">Nombre de la empresa:</label>
+          <input type="text" id="empresaNombre" required>
+
+          <label for="empresaCIF">CIF / NIF:</label>
+          <input type="text" id="empresaCIF" required>
+
+          <label for="empresaCalle">Calle:</label>
+          <input type="text" id="empresaCalle" required>
+
+          <label for="empresaNumero">Número:</label>
+          <input type="text" id="empresaNumero">
+
+          <label for="empresaPuerta">Puerta / Piso / Letra:</label>
+          <input type="text" id="empresaPuerta">
+
+          <label for="empresaCP">Código Postal:</label>
+          <input type="text" id="empresaCP">
+
+          <label for="empresaLocalidad">Localidad:</label>
+          <input type="text" id="empresaLocalidad">
+
+          <label for="empresaProvincia">Provincia:</label>
+          <input type="text" id="empresaProvincia">
+
+          <label for="empresaTelefono">Teléfono:</label>
+          <input type="tel" id="empresaTelefono">
+
+          <label for="empresaEmail">Email:</label>
+          <input type="email" id="empresaEmail">
+
+          <label for="empresaIBAN">IBAN:</label>
+          <input type="text" id="empresaIBAN">
+
+          <label for="empresaLogo">Logotipo:</label>
+          <input type="file" id="empresaLogo" accept="image/*">
+
+          <button type="submit">Guardar</button>
+          <button type="button" id="btnCancelarEmpresa">Cancelar</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- PANTALLA: CLIENTES -->
+    <section id="pantallaClientes" class="pantalla">
+      <h2>Clientes</h2>
+      <button id="btnAddCliente" aria-label="Añadir nuevo cliente">Añadir cliente</button>
+      <ul id="listaClientes" aria-label="Lista de clientes">
+        <!-- Clientes se agregan dinámicamente -->
+      </ul>
+      <div id="formClienteContainer" class="formulario">
+        <h3 id="formClienteTitulo">Nuevo Cliente</h3>
+        <form id="formCliente">
+          <label for="clienteNombre">Nombre / Razón social:</label>
+          <input type="text" id="clienteNombre" required>
+
+          <label for="clienteCIF">CIF / NIF:</label>
+          <input type="text" id="clienteCIF">
+
+          <label for="clienteCalle">Calle:</label>
+          <input type="text" id="clienteCalle">
+
+          <label for="clienteNumero">Número:</label>
+          <input type="text" id="clienteNumero">
+
+          <label for="clientePuerta">Puerta / Piso / Letra:</label>
+          <input type="text" id="clientePuerta">
+
+          <label for="clienteCP">Código Postal:</label>
+          <input type="text" id="clienteCP">
+
+          <label for="clienteLocalidad">Localidad:</label>
+          <input type="text" id="clienteLocalidad">
+
+          <label for="clienteProvincia">Provincia:</label>
+          <input type="text" id="clienteProvincia">
+
+          <label for="clienteTelefono">Teléfono:</label>
+          <input type="tel" id="clienteTelefono">
+
+          <label for="clienteEmail">Email:</label>
+          <input type="email" id="clienteEmail">
+
+          <button type="submit">Guardar</button>
+          <button type="button" id="btnCancelarCliente">Cancelar</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- PANTALLA: PRESUPUESTOS -->
+    <section id="pantallaPresupuestos" class="pantalla">
+      <h2>Presupuestos</h2>
+      <button id="btnAddPresupuesto" aria-label="Añadir nuevo presupuesto">Nuevo Presupuesto</button>
+      <ul id="listaPresupuestos" aria-label="Lista de presupuestos">
+        <!-- Presupuestos se agregan dinámicamente -->
+      </ul>
+    </section>
+
+    <!-- PANTALLA: FACTURAS -->
+    <section id="pantallaFacturas" class="pantalla">
+      <h2>Facturas</h2>
+      <button id="btnAddFactura" aria-label="Añadir nueva factura">Nueva Factura</button>
+      <ul id="listaFacturas" aria-label="Lista de facturas">
+        <!-- Facturas se agregan dinámicamente -->
+      </ul>
+    </section>
+
+    <!-- PANTALLA: AJUSTES -->
+    <section id="pantallaAjustes" class="pantalla">
+      <h2>Ajustes</h2>
+      <label for="colorPrincipal">Color principal:</label>
+      <input type="color" id="colorPrincipal">
+
+      <label for="tipoLetra">Tipo de letra:</label>
+      <select id="tipoLetra">
+        <option value="Arial">Arial</option>
+        <option value="Verdana">Verdana</option>
+        <option value="Helvetica">Helvetica</option>
+        <option value="Times New Roman">Times New Roman</option>
+      </select>
+
+      <label for="tamanoLetra">Tamaño de letra:</label>
+      <input type="number" id="tamanoLetra" min="10" max="30" value="16">
+
+      <label for="ivaDefault">IVA por defecto:</label>
+      <select id="ivaDefault">
+        <option value="21">21%</option>
+        <option value="10">10%</option>
+        <option value="0">0%</option>
+      </select>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
