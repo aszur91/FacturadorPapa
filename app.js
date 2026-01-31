@@ -1,33 +1,48 @@
-let facturaActual = null;
-alert('funciona')
-function generarFactura() {
-  const cantidad = Number(cantidadInput.value);
-  const precio = Number(precioInput.value);
-  const iva = Number(ivaSelect.value);
+document.addEventListener("DOMContentLoaded", () => {
 
-  const base = cantidad * precio;
-  const total = base + base * iva;
+  function get(id) {
+    return document.getElementById(id);
+  }
 
-  facturaActual = {
-    concepto: concepto.value,
-    base,
-    iva,
-    total,
-    pago: pago.value,
-    pagoExtra: pagoExtra.value
+  const campos = {
+    concepto: get("concepto"),
+    cantidad: get("cantidad"),
+    precio: get("precio"),
+    iva: get("iva"),
+    pago: get("pago"),
+    pagoExtra: get("pagoExtra")
   };
 
-  alert(`Total: ${total.toFixed(2)} €`);
-}
+  let facturaActual = null;
 
-function exportarPDF() {
-  alert("Aquí se integra jsPDF");
-}
+  window.generarFactura = function () {
+    const concepto = campos.concepto.value.trim();
+    const cantidad = Number(campos.cantidad.value);
+    const precio = Number(campos.precio.value);
+    const iva = Number(campos.iva.value);
 
-function enviarWhatsApp() {
-  if (!facturaActual) return;
-  const texto = encodeURIComponent(
-    `Factura:\n${facturaActual.concepto}\nTotal: ${facturaActual.total} €`
-  );
-  window.open(`https://wa.me/?text=${texto}`);
-}
+    if (!concepto || cantidad <= 0 || precio <= 0) {
+      alert("Revisa concepto, cantidad y precio");
+      return;
+    }
+
+    const base = cantidad * precio;
+    const ivaImporte = base * iva;
+    const total = base + ivaImporte;
+
+    facturaActual = {
+      concepto,
+      cantidad,
+      precio,
+      base,
+      iva,
+      ivaImporte,
+      total,
+      formaPago: campos.pago.value,
+      datoPago: campos.pagoExtra.value.trim(),
+      fecha: new Date().toLocaleDateString()
+    };
+
+    alert(
+      `Factura generada\n\n` +
+      `Base: ${base.toFixed(2)} €\n` +
