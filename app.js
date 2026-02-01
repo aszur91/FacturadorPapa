@@ -170,22 +170,63 @@ function actualizarListaPresupuestos() {
 }
 
 function abrirEdicionPresupuesto(index) {
-  const p = presupuestos[index];
-  const concepto = prompt("Concepto:", p.lineas[0].concepto);
-  const cant = parseFloat(prompt("Cantidad:", p.lineas[0].cantidad));
-  const precio = parseFloat(prompt("Precio:", p.lineas[0].precio));
+    const p = presupuestos[index];
+    let edicionCancelada = false;
 
-  if (concepto && !isNaN(cant) && !isNaN(precio)) {
-    p.lineas[0].concepto = concepto;
-    p.lineas[0].cantidad = cant;
-    p.lineas[0].precio = precio;
+    // Recorremos cada línea (concepto) del presupuesto
+    for (let i = 0; i < p.lineas.length; i++) {
+        let l = p.lineas[i];
+
+        // Preguntamos si desea editar este concepto específico
+        const deseaEditar = confirm(`¿Deseas editar el concepto: "${l.concepto}"? \n(Pulsa Cancelar para saltar al siguiente o salir)`);
+
+        if (deseaEditar) {
+            // Edición del Concepto
+            const nuevoConcepto = prompt(`Editar nombre del concepto [${i + 1}]:`, l.concepto);
+            if (nuevoConcepto === null) { edicionCancelada = true; break; } // Botón salir
+
+            // Edición de Cantidad
+            const nuevaCantStr = prompt(`Nueva cantidad para "${nuevoConcepto}":`, l.cantidad);
+            if (nuevaCantStr === null) { edicionCancelada = true; break; }
+            const nuevaCant = parseFloat(nuevaCantStr);
+
+            // Edición de Precio
+            const nuevoPrecioStr = prompt(`Nuevo precio para "${nuevoConcepto}":`, l.precio);
+            if (nuevoPrecioStr === null) { edicionCancelada = true; break; }
+            const nuevoPrecio = parseFloat(nuevoPrecioStr);
+
+            // Aplicar cambios si los datos son válidos
+            if (!isNaN(nuevaCant) && !isNaN(nuevoPrecio)) {
+                l.concepto = nuevoConcepto;
+                l.cantidad = nuevaCant;
+                l.precio = nuevoPrecio;
+            } else {
+                alert("Datos no válidos en este concepto. No se han guardado los cambios de esta línea.");
+            }
+        }
+
+        // Preguntar si desea continuar editando el siguiente concepto o salir definitivamente
+        if (i < p.lineas.length - 1) {
+            const continuar = confirm("¿Quieres seguir revisando el resto de conceptos? \n(Aceptar para continuar / Cancelar para finalizar edición)");
+            if (!continuar) break;
+        }
+    }
+
+    // Recalcular totales generales del presupuesto tras las ediciones
     const base = p.lineas.reduce((sum, l) => sum + (l.cantidad * l.precio), 0);
-    const iva = p.lineas.reduce((sum, l) => sum + (l.cantidad * l.precio * l.iva / 100), 0);
-    p.total = base + iva;
+    const ivaTotal = p.lineas.reduce((sum, l) => sum + (l.cantidad * l.precio * (l.iva / 100)), 0);
+    p.total = base + ivaTotal;
+
+    // Guardar y refrescar interfaz
     guardarLocalStorage();
     actualizarListaPresupuestos();
-    alert("Actualizado");
-  }
+    
+    // Si el modal de previsualización estaba abierto, lo actualizamos
+    if (modal.style.display === "block") {
+        previsualizarFactura(p);
+    }
+
+    alert(edicionCancelada ? "Edición finalizada o interrumpida." : "Presupuesto actualizado correctamente.");
 }
 
 document.getElementById('btnAddPresupuesto').addEventListener('click', () => {
