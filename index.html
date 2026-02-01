@@ -1,80 +1,83 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>App de Facturación</title>
-<link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.json">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>App de Facturación</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
 <header>
-  <h1>App de Facturación</h1>
-  <nav>
-    <button id="btnEmpresas">Empresas</button>
-    <button id="btnClientes">Clientes</button>
-    <button id="btnPresupuestos">Presupuestos</button>
-    <button id="btnFacturas">Facturas</button>
-    <button id="btnAjustes">Ajustes</button>
-  </nav>
+  <h1>FactuApp</h1>
 </header>
 
+<nav id="menuPrincipal">
+  <button id="btnEmpresas">Empresas</button>
+  <button id="btnClientes">Clientes</button>
+  <button id="btnPresupuestos">Presupuestos</button>
+  <button id="btnFacturas">Facturas</button>
+  <button id="btnAjustes">Ajustes</button>
+</nav>
+
 <main>
-  <!-- Empresas -->
   <section id="pantallaEmpresas" class="pantalla active">
-    <h2>Empresas</h2>
-    <button id="btnAddEmpresa">Añadir Empresa</button>
+    <h2>Mis Empresas</h2>
+    <button id="btnAddEmpresa" class="btn-main">+ Añadir Empresa</button>
     <ul id="listaEmpresas"></ul>
   </section>
 
-  <!-- Clientes -->
   <section id="pantallaClientes" class="pantalla">
-    <h2>Clientes</h2>
-    <button id="btnAddCliente">Añadir Cliente</button>
+    <h2>Mis Clientes</h2>
+    <button id="btnAddCliente" class="btn-main">+ Añadir Cliente</button>
     <ul id="listaClientes"></ul>
   </section>
 
-  <!-- Presupuestos -->
   <section id="pantallaPresupuestos" class="pantalla">
     <h2>Presupuestos</h2>
-    <label>Empresa activa:
-      <select id="empresaActiva">
-        <!-- Opciones generadas dinámicamente -->
-      </select>
-    </label>
-    <button id="btnAddPresupuesto">Crear Presupuesto</button>
+    <div class="selector-empresa">
+      <label for="empresaActiva">Empresa emisora:</label>
+      <select id="empresaActiva"></select>
+    </div>
+    <button id="btnAddPresupuesto" class="btn-main">Crear Nuevo Presupuesto</button>
     <ul id="listaPresupuestos"></ul>
   </section>
 
-  <!-- Facturas -->
   <section id="pantallaFacturas" class="pantalla">
-    <h2>Facturas</h2>
+    <h2>Historial de Facturas</h2>
     <ul id="listaFacturas"></ul>
   </section>
 
-  <!-- Ajustes -->
   <section id="pantallaAjustes" class="pantalla">
-    <h2>Ajustes</h2>
-    <label>Color principal: <input type="color" id="ajusteColor"></label>
-    <label>Tipo de letra: <input type="text" id="ajusteTipoLetra"></label>
-    <label>Tamaño de letra: <input type="number" id="ajusteTamano"></label>
-    <label>IVA por defecto: <input type="number" id="ajusteIVA"></label>
-    <button id="btnGuardarAjustes">Guardar Ajustes</button>
+    <h2>Configuración</h2>
+    <div class="form-ajustes">
+      <label>Color corporativo: <input type="color" id="ajusteColor"></label>
+      <label>Tipo de letra: 
+        <select id="ajusteTipoLetra">
+          <option value="Arial">Arial</option>
+          <option value="Courier">Courier</option>
+          <option value="Times">Times New Roman</option>
+        </select>
+      </label>
+      <label>Tamaño de fuente: <input type="number" id="ajusteTamano" min="10" max="24"></label>
+      <label>IVA por defecto (%): <input type="number" id="ajusteIVA" min="0"></label>
+      <button id="btnGuardarAjustes" class="btn-save">Guardar Cambios</button>
+    </div>
   </section>
-  
+
   <div id="modalPreview" class="modal">
     <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <div id="previewContenido"></div>
+      <div class="modal-header">
+        <span class="close-modal">&times;</span>
+        <h3>Borrador de Documento</h3>
+      </div>
+      <div id="previewContenido">
+        </div>
       <div class="modal-footer">
-        <button id="btnEditarPresupuesto" style="background-color: #ff9500; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-right: 10px;">
-          Editar Datos
-        </button>
-        <button id="btnConfirmarPDF" style="background-color: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-          Confirmar y Descargar PDF
-        </button>
+        <button id="btnEditarPresupuesto" class="btn-edit-modal">Editar Datos</button>
+        <button id="btnConfirmarPDF" class="btn-confirm-modal">Confirmar y Generar PDF</button>
       </div>
     </div>
   </div>
@@ -82,11 +85,13 @@
 
 <script src="app.js"></script>
 <script>
+  // Registro del Service Worker para modo Offline
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log("Service Worker listo"))
-      .catch((err) => console.log("Error en SW", err));
+      .then(() => console.log("PWA: Service Worker Activo"))
+      .catch((err) => console.error("PWA: Error", err));
   }
 </script>
+
 </body>
 </html>

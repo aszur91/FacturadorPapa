@@ -1,89 +1,151 @@
 :root {
   --primary-color: #007BFF;
   --bg-color: #f5f5f7;
+  --text-color: #1d1d1f;
+  --white: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   margin: 0;
-  padding-bottom: 70px; /* Espacio para el menú inferior en móvil */
+  padding-bottom: 80px; /* Espacio para que el menú no tape el contenido */
   background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   transition: all 0.3s ease;
 }
 
 header {
   background-color: var(--primary-color);
   color: white;
-  padding: 1rem;
+  padding: 15px;
   text-align: center;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-nav {
-  display: flex;
-  justify-content: space-around;
-  background: white;
-  padding: 10px;
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+header h1 { margin: 0; font-size: 1.2rem; }
+
+/* --- MENÚ DE NAVEGACIÓN (FIJO ABAJO) --- */
+nav#menuPrincipal {
   position: fixed;
   bottom: 0;
+  left: 0;
   width: 100%;
+  height: 65px;
+  background-color: var(--white);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  z-index: 1000;
+  padding: 0 10px;
 }
 
-nav button {
+nav#menuPrincipal button {
   background: none;
   border: none;
-  color: #666;
-  font-size: 0.8rem;
-  font-weight: bold;
+  color: #8e8e93;
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: color 0.2s;
 }
 
-nav button:focus {
+/* Estilo para el botón activo (se gestiona con JS) */
+nav#menuPrincipal button:active, 
+nav#menuPrincipal button:focus {
   color: var(--primary-color);
 }
 
-.pantalla { display: none; padding: 20px; max-width: 800px; margin: auto; }
-.pantalla.active { display: block; animation: fadeIn 0.3s; }
+/* --- PANTALLAS --- */
+.pantalla {
+  display: none;
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.pantalla.active {
+  display: block;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- BOTONES Y FORMULARIOS --- */
+.btn-main {
+  width: 100%;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+ul { list-style: none; padding: 0; }
 
 ul li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   background: white;
   margin-bottom: 10px;
   padding: 15px;
   border-radius: 12px;
-  border-left: 5px solid var(--primary-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-/* Estilos para el Modal */
+.btn-danger { background: #ff3b30; color: white; border: none; padding: 6px 12px; border-radius: 6px; }
+
+/* --- MODAL --- */
 .modal {
-  display: none; 
-  position: fixed; z-index: 1000; left: 0; top: 0;
-  width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
 }
 
 .modal-content {
-  background-color: white; margin: 5% auto; padding: 20px;
-  width: 90%; max-width: 600px; border-radius: 10px;
-  max-height: 80vh; overflow-y: auto;
+  background-color: white;
+  margin: 10% auto;
+  padding: 20px;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 20px;
+  max-height: 80vh;
+  overflow-y: auto;
 }
-
-.close-modal { float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
 
 #previewContenido {
-  border: 1px solid #ddd; padding: 20px; margin-top: 10px;
-  background: #fff; color: #333; font-family: 'Courier New', Courier, monospace;
+  font-family: 'Courier New', Courier, monospace;
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  font-size: 0.85rem;
 }
 
-.modal-footer { margin-top: 20px; text-align: right; }
-
-#btnConfirmarPDF {
-  background-color: var(--primary-color); color: white;
-  border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;
+.modal-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.btn-danger { background: #ff3b30; color: white; border: none; padding: 5px 10px; border-radius: 5px; }
+.btn-edit-modal { background: #ff9500; color: white; border: none; padding: 10px; border-radius: 8px; }
+.btn-confirm-modal { background: var(--primary-color); color: white; border: none; padding: 10px; border-radius: 8px; }
