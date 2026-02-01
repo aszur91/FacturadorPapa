@@ -65,29 +65,27 @@
   </section>
   
   <div id="modalPreview" class="modal">
-  <div class="modal-content">
-    <span class="close-modal">&times;</span>
-    <div id="previewContenido">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <div id="previewContenido"></div>
+      <div class="modal-footer">
+        <button id="btnEditarPresupuesto" style="background-color: #ff9500; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-right: 10px;">
+          Editar Datos
+        </button>
+        <button id="btnConfirmarPDF" style="background-color: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+          Confirmar y Descargar PDF
+        </button>
       </div>
-    <div class="modal-footer">
-      <button id="btnConfirmarPDF">Confirmar y Descargar PDF</button>
     </div>
   </div>
-  <div class="modal-footer">
-  <button id="btnEditarPresupuesto" style="background-color: #ff9500; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-right: 10px;">
-    Editar Datos
-  </button>
-  <button id="btnConfirmarPDF">Confirmar y Descargar PDF</button>
-</div>
-</div>
 </main>
 
 <script src="app.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log("Service Worker registrado con éxito"))
-      .catch((err) => console.log("Error al registrar el SW", err));
+      .then(() => console.log("Service Worker listo"))
+      .catch((err) => console.log("Error en SW", err));
   }
 </script>
 </body>

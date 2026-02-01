@@ -144,30 +144,65 @@ const listaPresupuestos = document.getElementById('listaPresupuestos');
 function actualizarListaPresupuestos(){
   listaPresupuestos.innerHTML='';
   presupuestos.forEach((p,index)=>{
-    const li=document.createElement('li');
-    li.innerHTML = `<div><strong>${p.numero}</strong> - ${clientes[p.cliente]?.nombre || 'S/C'} - ${p.total.toFixed(2)}€</div>`;
+    const li = document.createElement('li');
+    li.innerHTML = `<div><strong>#${p.numero}</strong> - ${clientes[p.cliente]?.nombre || 'S/C'} - ${p.total.toFixed(2)}€</div>`;
     
     const divBtns = document.createElement('div');
-    const btnConvertir=document.createElement('button');
-    btnConvertir.textContent='Facturar';
-    btnConvertir.onclick = ()=>convertirAFactura(index);
-    
-    const btnEliminar=document.createElement('button');
-    btnEliminar.textContent='X';
+
+    // Botón Editar (Desde la lista)
+    const btnEditar = document.createElement('button');
+    btnEditar.textContent = 'Editar';
+    btnEditar.style.backgroundColor = '#ff9500';
+    btnEditar.style.color = 'white';
+    btnEditar.style.marginRight = '5px';
+    btnEditar.onclick = () => abrirEdicionPresupuesto(index);
+
+    // Botón Facturar
+    const btnConvertir = document.createElement('button');
+    btnConvertir.textContent = 'Facturar';
+    btnConvertir.onclick = () => convertirAFactura(index);
+
+    // Botón Eliminar
+    const btnEliminar = document.createElement('button');
+    btnEliminar.textContent = 'X';
     btnEliminar.className = 'btn-danger';
-    btnEliminar.onclick = ()=>{
-      if(confirm('¿Eliminar presupuesto?')){
-        presupuestos.splice(index,1);
-        guardarLocalStorage();
-        actualizarListaPresupuestos();
-      }
+    btnEliminar.onclick = () => {
+        if(confirm('¿Eliminar presupuesto?')){
+            presupuestos.splice(index,1);
+            guardarLocalStorage();
+            actualizarListaPresupuestos();
+        }
     };
-    
+
+    divBtns.appendChild(btnEditar);
     divBtns.appendChild(btnConvertir);
     divBtns.appendChild(btnEliminar);
-    li.appendChild(divBtns);
-    listaPresupuestos.appendChild(li);
+    li.appendChild(divBtns); // ¡ESTO FALTABA!
+    listaPresupuestos.appendChild(li); // ¡ESTO TAMBIÉN!
   });
+}
+
+// Función para editar presupuesto (Mejorada)
+function abrirEdicionPresupuesto(index) {
+    const p = presupuestos[index];
+    const nuevoConcepto = prompt("Editar concepto:", p.lineas[0].concepto);
+    const nuevaCant = parseFloat(prompt("Cantidad:", p.lineas[0].cantidad));
+    const nuevoPrecio = parseFloat(prompt("Precio unitario:", p.lineas[0].precio));
+
+    if (nuevoConcepto !== null && !isNaN(nuevaCant) && !isNaN(nuevoPrecio)) {
+        p.lineas[0].concepto = nuevoConcepto;
+        p.lineas[0].cantidad = nuevaCant;
+        p.lineas[0].precio = nuevoPrecio;
+
+        // Recalcular total
+        const base = p.lineas.reduce((sum, l) => sum + (l.cantidad * l.precio), 0);
+        const ivaTotal = p.lineas.reduce((sum, l) => sum + (l.cantidad * l.precio * l.iva / 100), 0);
+        p.total = base + ivaTotal;
+
+        guardarLocalStorage();
+        actualizarListaPresupuestos();
+        alert("Actualizado correctamente");
+    }
 }
 
 document.getElementById('btnAddPresupuesto').addEventListener('click',()=>{
