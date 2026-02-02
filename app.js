@@ -12,7 +12,6 @@ let ajustes = JSON.parse(localStorage.getItem('ajustes')) || {
   ivaDefault: 21
 };
 
-// Elementos del DOM persistentes
 const pantallas = document.querySelectorAll('.pantalla');
 const modal = document.getElementById('modalPreview');
 const closeBtn = document.querySelector('.close-modal');
@@ -42,6 +41,29 @@ function aplicarAjustes() {
   }
 }
 
+// --- UTILIDAD: Validación de campos ---
+function validarCampos(config) {
+  let faltan = [];
+  config.campos.forEach(id => {
+    const input = document.getElementById(id);
+    if (!input || !input.value.trim()) {
+      faltan.push(input ? (input.placeholder || id) : id);
+    }
+  });
+  if (faltan.length > 0) {
+    alert("Los siguientes campos son obligatorios:\n- " + faltan.join("\n- "));
+    return false;
+  }
+  return true;
+}
+
+const toBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+});
+
 // ==========================================
 // 3. NAVEGACIÓN
 // ==========================================
@@ -52,7 +74,6 @@ function mostrarPantalla(id) {
   window.scrollTo(0, 0);
 }
 
-// Listeners de los botones del menú
 document.getElementById('btnEmpresas').addEventListener('click', () => mostrarPantalla('pantallaEmpresas'));
 document.getElementById('btnClientes').addEventListener('click', () => mostrarPantalla('pantallaClientes'));
 document.getElementById('btnPresupuestos').addEventListener('click', () => mostrarPantalla('pantallaPresupuestos'));
@@ -60,8 +81,94 @@ document.getElementById('btnFacturas').addEventListener('click', () => mostrarPa
 document.getElementById('btnAjustes').addEventListener('click', () => mostrarPantalla('pantallaAjustes'));
 
 // ==========================================
-// 4. GESTIÓN DE EMPRESAS Y CLIENTES
+// 4. GESTIÓN DE EMPRESAS (FORMULARIOS)
 // ==========================================
+document.getElementById('btnGuardarEmpresa').addEventListener('click', async () => {
+  const ids = ['empNombre', 'empCIF', 'empCalle', 'empNumero', 'empPuerta', 'empCP', 'empLocalidad', 'empProvincia', 'empTelefono', 'empEmail', 'empIBAN'];
+  if (!validarCampos({ campos: ids })) return;
+
+  const logoInput = document.getElementById('empLogo');
+  let logoBase64 = "";
+  if (logoInput.files[0]) {
+    logoBase64 = await toBase64(logoInput.files[0]);
+  }
+
+  const editIndex = parseInt(document.getElementById('empEditIndex').value);
+  
+  const empresaData = {
+    nombre: document.getElementById('empNombre').value,
+    cif: document.getElementById('empCIF').value,
+    calle: document.getElementById('empCalle').value,
+    numero: document.getElementById('empNumero').value,
+    puerta: document.getElementById('empPuerta').value,
+    cp: document.getElementById('empCP').value,
+    localidad: document.getElementById('empLocalidad').value,
+    provincia: document.getElementById('empProvincia').value,
+    telefono: document.getElementById('empTelefono').value,
+    email: document.getElementById('empEmail').value,
+    iban: document.getElementById('empIBAN').value,
+    logo: logoBase64 || (editIndex !== -1 ? empresas[editIndex].logo : "")
+  };
+
+  if (editIndex === -1) {
+    empresas.push(empresaData);
+  } else {
+    empresas[editIndex] = empresaData;
+    document.getElementById('empEditIndex').value = "-1";
+  }
+
+  document.getElementById('formEmpresa').reset();
+  guardarLocalStorage();
+  actualizarListaEmpresas();
+  alert("Empresa guardada con éxito");
+});
+
+function actualizarListaEmpresas() {
+  const lista = document.getElementById('listaEmpresas');
+  lista.innerHTML = '';
+  empresas.forEach((e, i) => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div>
+        ${e.logo ? `<img src="${e.logo}" style="height:30px; margin-right:10px; vertical-align:middle;">` : ''}
+        <strong>${e.nombre}</strong> <small>(${e.cif})</small>
+      </div>`;
+    
+    const div = document.createElement('div');
+    const btnEdit = document.createElement('button');
+    btnEdit.textContent = 'Editar';
+    btnEdit.className = 'btn-update';
+    btnEdit.onclick = () => cargarEmpresaEnForm(i);
+    
+    const btnDel = document.createElement('button');
+    btnDel.textContent = 'Eliminar';
+    btnDel.className = 'btn-danger';
+    btnDel.onclick = () => { if(confirm('¿Eliminar empresa?')) { empresas.splice(i,1); guardarLocalStorage(); actualizarListaEmpresas(); } };
+    
+    div.append(btnEdit, btnDel);
+    li.appendChild(div);
+    lista.appendChild(li);
+  });
+  actualizarSelectEmpresas();
+}
+
+function cargarEmpresaEnForm(i) {
+  const e = empresas[i];
+  document.getElementById('empNombre').value = e.nombre;
+  document.getElementById('empCIF').value = e.cif;
+  document.getElementById('empCalle').value = e.calle;
+  document.getElementById('empNumero').value = e.numero;
+  document.getElementById('empPuerta').value = e.puerta;
+  document.getElementById('empCP').value = e.cp;
+  document.getElementById('empLocalidad').value = e.localidad;
+  document.getElementById('empProvincia').value = e.provincia;
+  document.getElementById('empTelefono').value = e.telefono;
+  document.getElementById('empEmail').value = e.email;
+  document.getElementById('empIBAN').value = e.iban;
+  document.getElementById('empEditIndex').value = i;
+  window.scrollTo(0,0);
+}
+
 function actualizarSelectEmpresas() {
   const select = document.getElementById('empresaActiva');
   if (!select) return;
@@ -74,62 +181,84 @@ function actualizarSelectEmpresas() {
   });
 }
 
-function actualizarListaEmpresas() {
-  const lista = document.getElementById('listaEmpresas');
-  lista.innerHTML = '';
-  empresas.forEach((e, index) => {
-    const li = document.createElement('li');
-    li.innerHTML = `<span>${e.nombre}</span>`;
-    const btn = document.createElement('button');
-    btn.textContent = 'Eliminar';
-    btn.className = 'btn-danger';
-    btn.onclick = () => {
-      if (confirm('¿Eliminar empresa?')) {
-        empresas.splice(index, 1);
-        guardarLocalStorage();
-        actualizarListaEmpresas();
-      }
-    };
-    li.appendChild(btn);
-    lista.appendChild(li);
-  });
-  actualizarSelectEmpresas();
-}
+// ==========================================
+// 5. GESTIÓN DE CLIENTES (FORMULARIOS)
+// ==========================================
+document.getElementById('btnGuardarCliente').addEventListener('click', () => {
+  const ids = ['cliNombre', 'cliApellidos', 'cliCIF', 'cliCalle', 'cliNumero', 'cliPuerta', 'cliCP', 'cliLocalidad', 'cliProvincia', 'cliTelefono', 'cliEmail'];
+  if (!validarCampos({ campos: ids })) return;
+
+  const editIndex = parseInt(document.getElementById('cliEditIndex').value);
+  const clienteData = {
+    nombre: document.getElementById('cliNombre').value,
+    apellidos: document.getElementById('cliApellidos').value,
+    cif: document.getElementById('cliCIF').value,
+    calle: document.getElementById('cliCalle').value,
+    numero: document.getElementById('cliNumero').value,
+    puerta: document.getElementById('cliPuerta').value,
+    cp: document.getElementById('cliCP').value,
+    localidad: document.getElementById('cliLocalidad').value,
+    provincia: document.getElementById('cliProvincia').value,
+    telefono: document.getElementById('cliTelefono').value,
+    email: document.getElementById('cliEmail').value
+  };
+
+  if (editIndex === -1) {
+    clientes.push(clienteData);
+  } else {
+    clientes[editIndex] = clienteData;
+    document.getElementById('cliEditIndex').value = "-1";
+  }
+
+  document.getElementById('formCliente').reset();
+  guardarLocalStorage();
+  actualizarListaClientes();
+  alert("Cliente guardado correctamente");
+});
 
 function actualizarListaClientes() {
   const lista = document.getElementById('listaClientes');
   lista.innerHTML = '';
-  clientes.forEach((c, index) => {
+  clientes.forEach((c, i) => {
     const li = document.createElement('li');
-    li.innerHTML = `<span><strong>${c.nombre}</strong> (${c.email})</span>`;
-    const btn = document.createElement('button');
-    btn.textContent = 'Eliminar';
-    btn.className = 'btn-danger';
-    btn.onclick = () => {
-      if (confirm('¿Eliminar cliente?')) {
-        clientes.splice(index, 1);
-        guardarLocalStorage();
-        actualizarListaClientes();
-      }
-    };
-    li.appendChild(btn);
+    li.innerHTML = `<span><strong>${c.nombre} ${c.apellidos}</strong></span>`;
+    const div = document.createElement('div');
+    
+    const btnEdit = document.createElement('button');
+    btnEdit.textContent = 'Editar';
+    btnEdit.className = 'btn-update';
+    btnEdit.onclick = () => cargarClienteEnForm(i);
+
+    const btnDel = document.createElement('button');
+    btnDel.textContent = 'Eliminar';
+    btnDel.className = 'btn-danger';
+    btnDel.onclick = () => { if(confirm('¿Eliminar cliente?')) { clientes.splice(i,1); guardarLocalStorage(); actualizarListaClientes(); } };
+    
+    div.append(btnEdit, btnDel);
+    li.appendChild(div);
     lista.appendChild(li);
   });
 }
 
-document.getElementById('btnAddEmpresa').addEventListener('click', () => {
-  const nombre = prompt('Nombre de la empresa:');
-  if (nombre) { empresas.push({ nombre }); guardarLocalStorage(); actualizarListaEmpresas(); }
-});
-
-document.getElementById('btnAddCliente').addEventListener('click', () => {
-  const nombre = prompt('Nombre del cliente:');
-  const email = prompt('Email del cliente:');
-  if (nombre) { clientes.push({ nombre, email }); guardarLocalStorage(); actualizarListaClientes(); }
-});
+function cargarClienteEnForm(i) {
+  const c = clientes[i];
+  document.getElementById('cliNombre').value = c.nombre;
+  document.getElementById('cliApellidos').value = c.apellidos;
+  document.getElementById('cliCIF').value = c.cif;
+  document.getElementById('cliCalle').value = c.calle;
+  document.getElementById('cliNumero').value = c.numero;
+  document.getElementById('cliPuerta').value = c.puerta;
+  document.getElementById('cliCP').value = c.cp;
+  document.getElementById('cliLocalidad').value = c.localidad;
+  document.getElementById('cliProvincia').value = c.provincia;
+  document.getElementById('cliTelefono').value = c.telefono;
+  document.getElementById('cliEmail').value = c.email;
+  document.getElementById('cliEditIndex').value = i;
+  window.scrollTo(0,0);
+}
 
 // ==========================================
-// 5. LÓGICA DE PRESUPUESTOS Y EDICIÓN
+// 6. LÓGICA DE PRESUPUESTOS Y FACTURAS
 // ==========================================
 function actualizarListaPresupuestos() {
   const lista = document.getElementById('listaPresupuestos');
@@ -137,21 +266,17 @@ function actualizarListaPresupuestos() {
   presupuestos.forEach((p, index) => {
     const li = document.createElement('li');
     li.innerHTML = `<div><strong>#${p.numero}</strong> - ${clientes[p.cliente]?.nombre || 'S/C'} - ${p.total.toFixed(2)}€</div>`;
-    
     const divBtns = document.createElement('div');
-    divBtns.style.display = 'flex';
-    divBtns.style.gap = '5px';
+    divBtns.style.display = 'flex'; divBtns.style.gap = '5px';
 
     const btnVer = document.createElement('button');
     btnVer.textContent = 'Ver/PDF';
-    btnVer.style.backgroundColor = 'var(--primary-color)';
-    btnVer.style.color = 'white';
+    btnVer.style.backgroundColor = 'var(--primary-color)'; btnVer.style.color = 'white';
     btnVer.onclick = () => previsualizarFactura(p);
 
     const btnEdit = document.createElement('button');
     btnEdit.textContent = 'Editar';
-    btnEdit.style.backgroundColor = '#ff9500';
-    btnEdit.style.color = 'white';
+    btnEdit.style.backgroundColor = '#ff9500'; btnEdit.style.color = 'white';
     btnEdit.onclick = () => abrirEdicionPresupuesto(index);
 
     const btnFact = document.createElement('button');
@@ -159,8 +284,7 @@ function actualizarListaPresupuestos() {
     btnFact.onclick = () => convertirAFactura(index);
 
     const btnDel = document.createElement('button');
-    btnDel.textContent = 'X';
-    btnDel.className = 'btn-danger';
+    btnDel.textContent = 'X'; btnDel.className = 'btn-danger';
     btnDel.onclick = () => { if (confirm('¿Eliminar?')) { presupuestos.splice(index, 1); guardarLocalStorage(); actualizarListaPresupuestos(); } };
 
     divBtns.append(btnVer, btnEdit, btnFact, btnDel);
@@ -172,70 +296,31 @@ function actualizarListaPresupuestos() {
 function abrirEdicionPresupuesto(index) {
     const p = presupuestos[index];
     let edicionCancelada = false;
-
-    // Recorremos cada línea (concepto) del presupuesto
     for (let i = 0; i < p.lineas.length; i++) {
         let l = p.lineas[i];
-
-        // Preguntamos si desea editar este concepto específico
-        const deseaEditar = confirm(`¿Deseas editar el concepto: "${l.concepto}"? \n(Pulsa Cancelar para saltar al siguiente o salir)`);
-
+        const deseaEditar = confirm(`¿Deseas editar: "${l.concepto}"?`);
         if (deseaEditar) {
-            // Edición del Concepto
-            const nuevoConcepto = prompt(`Editar nombre del concepto [${i + 1}]:`, l.concepto);
-            if (nuevoConcepto === null) { edicionCancelada = true; break; } // Botón salir
-
-            // Edición de Cantidad
-            const nuevaCantStr = prompt(`Nueva cantidad para "${nuevoConcepto}":`, l.cantidad);
-            if (nuevaCantStr === null) { edicionCancelada = true; break; }
-            const nuevaCant = parseFloat(nuevaCantStr);
-
-            // Edición de Precio
-            const nuevoPrecioStr = prompt(`Nuevo precio para "${nuevoConcepto}":`, l.precio);
-            if (nuevoPrecioStr === null) { edicionCancelada = true; break; }
-            const nuevoPrecio = parseFloat(nuevoPrecioStr);
-
-            // Aplicar cambios si los datos son válidos
-            if (!isNaN(nuevaCant) && !isNaN(nuevoPrecio)) {
-                l.concepto = nuevoConcepto;
-                l.cantidad = nuevaCant;
-                l.precio = nuevoPrecio;
-            } else {
-                alert("Datos no válidos en este concepto. No se han guardado los cambios de esta línea.");
+            const nuevoC = prompt(`Editar concepto [${i + 1}]:`, l.concepto);
+            if (nuevoC === null) { edicionCancelada = true; break; }
+            const nuevaCant = parseFloat(prompt(`Cantidad:`, l.cantidad));
+            const nuevoP = parseFloat(prompt(`Precio:`, l.precio));
+            if (!isNaN(nuevaCant) && !isNaN(nuevoP)) {
+                l.concepto = nuevoC; l.cantidad = nuevaCant; l.precio = nuevoP;
             }
         }
-
-        // Preguntar si desea continuar editando el siguiente concepto o salir definitivamente
-        if (i < p.lineas.length - 1) {
-            const continuar = confirm("¿Quieres seguir revisando el resto de conceptos? \n(Aceptar para continuar / Cancelar para finalizar edición)");
-            if (!continuar) break;
-        }
+        if (i < p.lineas.length - 1 && !confirm("¿Continuar editando líneas?")) break;
     }
-
-    // Recalcular totales generales del presupuesto tras las ediciones
     const base = p.lineas.reduce((sum, l) => sum + (l.cantidad * l.precio), 0);
-    const ivaTotal = p.lineas.reduce((sum, l) => sum + (l.cantidad * l.precio * (l.iva / 100)), 0);
-    p.total = base + ivaTotal;
-
-    // Guardar y refrescar interfaz
-    guardarLocalStorage();
-    actualizarListaPresupuestos();
-    
-    // Si el modal de previsualización estaba abierto, lo actualizamos
-    if (modal.style.display === "block") {
-        previsualizarFactura(p);
-    }
-
-    alert(edicionCancelada ? "Edición finalizada o interrumpida." : "Presupuesto actualizado correctamente.");
+    p.total = base + (base * (ajustes.ivaDefault / 100));
+    guardarLocalStorage(); actualizarListaPresupuestos();
+    if (modal.style.display === "block") previsualizarFactura(p);
 }
 
 document.getElementById('btnAddPresupuesto').addEventListener('click', () => {
   const eIdx = document.getElementById('empresaActiva').value;
   if (eIdx === '' || clientes.length === 0) return alert('Configura empresa y clientes primero');
-  
   const cIdx = prompt(clientes.map((c, i) => `${i}: ${c.nombre}`).join('\n'));
   if (!clientes[cIdx]) return;
-
   const lineas = [];
   let seguir = true;
   while (seguir) {
@@ -245,16 +330,14 @@ document.getElementById('btnAddPresupuesto').addEventListener('click', () => {
     if (concepto && !isNaN(precio)) lineas.push({ concepto, cantidad, precio, iva: ajustes.ivaDefault });
     seguir = confirm('¿Otra línea?');
   }
-
   const base = lineas.reduce((sum, l) => sum + l.cantidad * l.precio, 0);
-  const total = base + (base * ajustes.ivaDefault / 100);
+  const total = base + (base * (ajustes.ivaDefault / 100));
   presupuestos.push({ empresa: eIdx, cliente: cIdx, numero: presupuestos.length + 1, fecha: new Date().toISOString().split('T')[0], lineas, total });
-  guardarLocalStorage();
-  actualizarListaPresupuestos();
+  guardarLocalStorage(); actualizarListaPresupuestos();
 });
 
 // ==========================================
-// 6. FACTURAS Y MODAL DE PREVISUALIZACIÓN
+// 7. FACTURAS Y PDF
 // ==========================================
 function actualizarListaFacturas() {
   const lista = document.getElementById('listaFacturas');
@@ -275,106 +358,78 @@ function convertirAFactura(idx) {
   const tipo = prompt('Pago: Transferencia, Bizum, Efectivo', 'Transferencia');
   const info = prompt('IBAN / Ref:');
   facturas.push({ ...p, numero: facturas.length + 1, formaPago: { tipo, infoAdicional: info } });
-  guardarLocalStorage();
-  actualizarListaFacturas();
-  mostrarPantalla('pantallaFacturas');
+  guardarLocalStorage(); actualizarListaFacturas(); mostrarPantalla('pantallaFacturas');
 }
 
 function previsualizarFactura(f) {
   facturaParaExportar = f;
   const contenido = document.getElementById('previewContenido');
   let subtotal = 0, totalIVA = 0;
-  
   const tabla = f.lineas.map(l => {
     const t = l.cantidad * l.precio;
     subtotal += t; totalIVA += t * (l.iva / 100);
     return `<tr><td>${l.concepto}</td><td>${l.cantidad}</td><td>${l.precio.toFixed(2)}€</td><td>${t.toFixed(2)}€</td></tr>`;
   }).join('');
-
   contenido.innerHTML = `
     <div style="border-bottom: 2px solid var(--primary-color); margin-bottom:10px;">
-      <h3 style="color:var(--primary-color)">${empresas[f.empresa].nombre}</h3>
+      <h3>${empresas[f.empresa].nombre}</h3>
       <p>Para: ${clientes[f.cliente].nombre}</p>
     </div>
     <table style="width:100%; font-size:0.8rem;">
       <thead><tr style="background:#eee"><th>Ítem</th><th>Cant.</th><th>P.U.</th><th>Total</th></tr></thead>
       <tbody>${tabla}</tbody>
     </table>
-    <div style="text-align:right; border-top:1px solid #ddd; margin-top:10px;">
-      <p>Subtotal: ${subtotal.toFixed(2)}€ | IVA: ${totalIVA.toFixed(2)}€</p>
-      <h4 style="color:var(--primary-color)">TOTAL: ${(subtotal + totalIVA).toFixed(2)}€</h4>
+    <div style="text-align:right; margin-top:10px;">
+      <p>IVA: ${totalIVA.toFixed(2)}€</p>
+      <h4>TOTAL: ${(subtotal + totalIVA).toFixed(2)}€</h4>
     </div>`;
   modal.style.display = "block";
 }
 
-// Listeners del Modal
-if (closeBtn) closeBtn.onclick = () => modal.style.display = "none";
-window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; };
-
-document.getElementById('btnConfirmarPDF').onclick = () => {
-  if (facturaParaExportar) exportarPDF(facturaParaExportar);
-  modal.style.display = "none";
-};
-
-document.getElementById('btnEditarPresupuesto').addEventListener('click', () => {
-  if (facturaParaExportar) {
-    const idx = presupuestos.findIndex(p => p.numero === facturaParaExportar.numero);
-    if (idx !== -1) {
-      modal.style.display = "none";
-      abrirEdicionPresupuesto(idx);
-    }
-  }
-});
-
-// ==========================================
-// 7. EXPORTACIÓN PDF (jspdf)
-// ==========================================
 function exportarPDF(f) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   const emp = empresas[f.empresa];
   const cli = clientes[f.cliente];
-
   doc.setFontSize(18); doc.setTextColor(ajustes.colorPrincipal);
   doc.text(emp.nombre.toUpperCase(), 14, 20);
   doc.setFontSize(10); doc.setTextColor(0);
-  doc.text(`CLIENTE: ${cli.nombre} (${cli.email})`, 120, 20);
+  doc.text(`CLIENTE: ${cli.nombre} ${cli.apellidos || ''}`, 120, 20);
   doc.line(14, 45, 196, 45);
-  doc.text(`Factura nº: ${f.numero} | Fecha: ${f.fecha}`, 14, 52);
-
   let y = 65, subtotal = 0, totalIVA = 0;
-  doc.setFillColor(240); doc.rect(14, y, 182, 8, 'F');
-  doc.text("Concepto", 16, y + 6); doc.text("Total", 170, y + 6);
-
   f.lineas.forEach(l => {
-    y += 10;
     const t = l.cantidad * l.precio;
     subtotal += t; totalIVA += t * (l.iva / 100);
-    doc.text(l.concepto, 16, y); doc.text(`${t.toFixed(2)}€`, 170, y);
+    doc.text(`${l.concepto} x${l.cantidad}`, 16, y);
+    doc.text(`${t.toFixed(2)}€`, 170, y);
+    y += 10;
   });
-
-  y += 15; doc.text(`SUBTOTAL: ${subtotal.toFixed(2)}€`, 130, y);
-  y += 7; doc.text(`IVA: ${totalIVA.toFixed(2)}€`, 130, y);
-  y += 10; doc.setFontSize(12); doc.text(`TOTAL: ${(subtotal + totalIVA).toFixed(2)}€`, 130, y);
-
-  if (f.formaPago) {
-    y += 20; doc.setFontSize(9);
-    doc.text(`Pago: ${f.formaPago.tipo} - ${f.formaPago.infoAdicional}`, 14, y);
-  }
+  doc.text(`TOTAL: ${(subtotal + totalIVA).toFixed(2)}€`, 130, y + 10);
   doc.save(`Factura_${f.numero}.pdf`);
 }
 
 // ==========================================
-// 8. AJUSTES E INICIALIZACIÓN
+// 8. INICIALIZACIÓN
 // ==========================================
+if (closeBtn) closeBtn.onclick = () => modal.style.display = "none";
+window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; };
+document.getElementById('btnConfirmarPDF').onclick = () => {
+  if (facturaParaExportar) exportarPDF(facturaParaExportar);
+  modal.style.display = "none";
+};
+document.getElementById('btnEditarPresupuesto').addEventListener('click', () => {
+  if (facturaParaExportar) {
+    const idx = presupuestos.findIndex(p => p.numero === facturaParaExportar.numero);
+    if (idx !== -1) { modal.style.display = "none"; abrirEdicionPresupuesto(idx); }
+  }
+});
+
 document.getElementById('btnGuardarAjustes').addEventListener('click', () => {
   ajustes.colorPrincipal = document.getElementById('ajusteColor').value;
   ajustes.tipoLetra = document.getElementById('ajusteTipoLetra').value;
   ajustes.tamanoLetra = document.getElementById('ajusteTamano').value;
   ajustes.ivaDefault = document.getElementById('ajusteIVA').value;
-  guardarLocalStorage();
-  aplicarAjustes();
-  alert('Ajustes guardados');
+  guardarLocalStorage(); aplicarAjustes(); alert('Ajustes guardados');
 });
 
 document.addEventListener('DOMContentLoaded', () => {
