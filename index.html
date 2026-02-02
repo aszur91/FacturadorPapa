@@ -24,10 +24,17 @@
 
 <main>
   <section id="pantallaEmpresas" class="pantalla active">
-    <h2>Gestión de Empresas</h2>
-    
+  <div id="cabeceraEmpresas" class="cabecera-seccion">
+    <h2>Mis Empresas</h2>
+    <button id="btnNuevaEmpresa" class="btn-main-short">+ Añadir Empresa</button>
+  </div>
+
+  <div id="contenedorFormEmpresa" style="display: none;">
     <form id="formEmpresa" class="formulario-card">
-      <h3>Datos de la Empresa</h3>
+      <div class="form-header">
+        <h3 id="tituloFormEmpresa">Nueva Empresa</h3>
+        <button type="button" class="btn-cancelar" onclick="alternarVista('Empresa', false)">Cancelar</button>
+      </div>
       <div class="grid-form">
         <input type="text" id="empNombre" placeholder="Nombre de empresa" required>
         <input type="text" id="empCIF" placeholder="CIF/NIF" required>
@@ -41,22 +48,32 @@
         <input type="email" id="empEmail" placeholder="Email" required>
         <input type="text" id="empIBAN" placeholder="IBAN" required>
         <div class="upload-box">
-          <label>Logotipo (opcional):</label>
+          <label>Logotipo:</label>
           <input type="file" id="empLogo" accept="image/*">
         </div>
       </div>
       <input type="hidden" id="empEditIndex" value="-1">
       <button type="button" id="btnGuardarEmpresa" class="btn-main">Guardar Empresa</button>
     </form>
-  
-    <ul id="listaEmpresas"></ul>
-  </section>
+  </div>
 
-  <section id="pantallaClientes" class="pantalla">
-    <h2>Gestión de Clientes</h2>
-    
+  <div id="contenedorListaEmpresas">
+    <ul id="listaEmpresas"></ul>
+  </div>
+</section>
+
+<section id="pantallaClientes" class="pantalla">
+  <div id="cabeceraClientes" class="cabecera-seccion">
+    <h2>Mis Clientes</h2>
+    <button id="btnNuevoCliente" class="btn-main-short">+ Añadir Cliente</button>
+  </div>
+
+  <div id="contenedorFormCliente" style="display: none;">
     <form id="formCliente" class="formulario-card">
-      <h3>Datos del Cliente</h3>
+      <div class="form-header">
+        <h3 id="tituloFormCliente">Nuevo Cliente</h3>
+        <button type="button" class="btn-cancelar" onclick="alternarVista('Cliente', false)">Cancelar</button>
+      </div>
       <div class="grid-form">
         <input type="text" id="cliNombre" placeholder="Nombre" required>
         <input type="text" id="cliApellidos" placeholder="Apellidos" required>
@@ -73,9 +90,12 @@
       <input type="hidden" id="cliEditIndex" value="-1">
       <button type="button" id="btnGuardarCliente" class="btn-main">Guardar Cliente</button>
     </form>
-  
+  </div>
+
+  <div id="contenedorListaClientes">
     <ul id="listaClientes"></ul>
-  </section>
+  </div>
+</section>
   
   <section id="pantallaPresupuestos" class="pantalla">
     <h2>Presupuestos</h2>
