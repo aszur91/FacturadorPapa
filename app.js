@@ -119,8 +119,10 @@ document.getElementById('btnGuardarEmpresa').addEventListener('click', async () 
 
   document.getElementById('formEmpresa').reset();
   guardarLocalStorage();
-  actualizarListaEmpresas();
+  actualizarListaEmpresas();  
   alert("Empresa guardada con éxito");
+
+  alternarVista('Empresa', false);
 });
 
 function actualizarListaEmpresas() {
@@ -152,8 +154,11 @@ function actualizarListaEmpresas() {
   actualizarSelectEmpresas();
 }
 
+document.getElementById('btnNuevaEmpresa').addEventListener('click', () => alternarVista('Empresa', true));
+
 function cargarEmpresaEnForm(i) {
   const e = empresas[i];
+  document.getElementById('tituloFormEmpresa').textContent = "Editar Empresa";
   document.getElementById('empNombre').value = e.nombre;
   document.getElementById('empCIF').value = e.cif;
   document.getElementById('empCalle').value = e.calle;
@@ -166,6 +171,8 @@ function cargarEmpresaEnForm(i) {
   document.getElementById('empEmail').value = e.email;
   document.getElementById('empIBAN').value = e.iban;
   document.getElementById('empEditIndex').value = i;
+  
+  alternarVista('Empresa', true);
   window.scrollTo(0,0);
 }
 
@@ -214,6 +221,8 @@ document.getElementById('btnGuardarCliente').addEventListener('click', () => {
   guardarLocalStorage();
   actualizarListaClientes();
   alert("Cliente guardado correctamente");
+
+  alternarVista('Cliente', false);
 });
 
 function actualizarListaClientes() {
@@ -240,8 +249,11 @@ function actualizarListaClientes() {
   });
 }
 
+document.getElementById('btnNuevoCliente').addEventListener('click', () => alternarVista('Cliente', true));
+
 function cargarClienteEnForm(i) {
   const c = clientes[i];
+  document.getElementById('tituloFormCliente').textContent = "Editar Cliente";
   document.getElementById('cliNombre').value = c.nombre;
   document.getElementById('cliApellidos').value = c.apellidos;
   document.getElementById('cliCIF').value = c.cif;
@@ -254,6 +266,8 @@ function cargarClienteEnForm(i) {
   document.getElementById('cliTelefono').value = c.telefono;
   document.getElementById('cliEmail').value = c.email;
   document.getElementById('cliEditIndex').value = i;
+
+  alternarVista('Cliente', true);
   window.scrollTo(0,0);
 }
 
