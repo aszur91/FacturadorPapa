@@ -24,17 +24,59 @@
 
 <main>
   <section id="pantallaEmpresas" class="pantalla active">
-    <h2>Mis Empresas</h2>
-    <button id="btnAddEmpresa" class="btn-main">+ Añadir Empresa</button>
+    <h2>Gestión de Empresas</h2>
+    
+    <form id="formEmpresa" class="formulario-card">
+      <h3>Datos de la Empresa</h3>
+      <div class="grid-form">
+        <input type="text" id="empNombre" placeholder="Nombre de empresa" required>
+        <input type="text" id="empCIF" placeholder="CIF/NIF" required>
+        <input type="text" id="empCalle" placeholder="Calle" required>
+        <input type="text" id="empNumero" placeholder="Número" required>
+        <input type="text" id="empPuerta" placeholder="Puerta/Piso/Letra" required>
+        <input type="text" id="empCP" placeholder="Código Postal" required>
+        <input type="text" id="empLocalidad" placeholder="Localidad" required>
+        <input type="text" id="empProvincia" placeholder="Provincia" required>
+        <input type="tel" id="empTelefono" placeholder="Teléfono" required>
+        <input type="email" id="empEmail" placeholder="Email" required>
+        <input type="text" id="empIBAN" placeholder="IBAN" required>
+        <div class="upload-box">
+          <label>Logotipo (opcional):</label>
+          <input type="file" id="empLogo" accept="image/*">
+        </div>
+      </div>
+      <input type="hidden" id="empEditIndex" value="-1">
+      <button type="button" id="btnGuardarEmpresa" class="btn-main">Guardar Empresa</button>
+    </form>
+  
     <ul id="listaEmpresas"></ul>
   </section>
 
   <section id="pantallaClientes" class="pantalla">
-    <h2>Mis Clientes</h2>
-    <button id="btnAddCliente" class="btn-main">+ Añadir Cliente</button>
+    <h2>Gestión de Clientes</h2>
+    
+    <form id="formCliente" class="formulario-card">
+      <h3>Datos del Cliente</h3>
+      <div class="grid-form">
+        <input type="text" id="cliNombre" placeholder="Nombre" required>
+        <input type="text" id="cliApellidos" placeholder="Apellidos" required>
+        <input type="text" id="cliCIF" placeholder="CIF/NIF" required>
+        <input type="text" id="cliCalle" placeholder="Calle" required>
+        <input type="text" id="cliNumero" placeholder="Número" required>
+        <input type="text" id="cliPuerta" placeholder="Puerta/Piso/Letra" required>
+        <input type="text" id="cliCP" placeholder="Código Postal" required>
+        <input type="text" id="cliLocalidad" placeholder="Localidad" required>
+        <input type="text" id="cliProvincia" placeholder="Provincia" required>
+        <input type="tel" id="cliTelefono" placeholder="Teléfono" required>
+        <input type="email" id="cliEmail" placeholder="Email" required>
+      </div>
+      <input type="hidden" id="cliEditIndex" value="-1">
+      <button type="button" id="btnGuardarCliente" class="btn-main">Guardar Cliente</button>
+    </form>
+  
     <ul id="listaClientes"></ul>
   </section>
-
+  
   <section id="pantallaPresupuestos" class="pantalla">
     <h2>Presupuestos</h2>
     <div class="selector-empresa">
