@@ -149,3 +149,38 @@ ul li {
 
 .btn-edit-modal { background: #ff9500; color: white; border: none; padding: 10px; border-radius: 8px; }
 .btn-confirm-modal { background: var(--primary-color); color: white; border: none; padding: 10px; border-radius: 8px; }
+
+.formulario-card {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.grid-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .grid-form { grid-template-columns: 1fr; }
+}
+
+.formulario-card input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.upload-box {
+  grid-column: 1 / -1;
+  padding: 10px;
+  background: #f8f9fa;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+}
+
+.btn-update { background: #5856d6; color: white; border: none; padding: 6px 12px; border-radius: 6px; margin-right: 5px; }
