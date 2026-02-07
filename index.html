@@ -9,6 +9,10 @@
 </head>
 <body>
 
+<header>
+  <h1>FactuApp Pro</h1>
+</header>
+
 <nav id="menuPrincipal">
   <button id="btnEmpresas">Empresas</button>
   <button id="btnClientes">Clientes</button>
@@ -19,7 +23,10 @@
 
 <main>
   <section id="pantallaEmpresas" class="pantalla active">
-    <div class="cabecera-seccion"><h2>Empresas</h2><button id="btnNuevaEmpresa" class="btn-main-short">+ Añadir</button></div>
+    <div class="cabecera-seccion">
+      <h2>Mis Empresas</h2>
+      <button id="btnNuevaEmpresa" class="btn-main-short">+ Añadir</button>
+    </div>
     <div id="contenedorFormEmpresa" style="display: none;">
       <form id="formempresa" class="formulario-card">
         <button type="button" class="btn-cerrar-esquina" onclick="alternarVista('Empresa', false)">X</button>
@@ -35,7 +42,10 @@
           <input type="text" id="empTelefono" placeholder="Teléfono">
           <input type="email" id="empEmail" placeholder="Email">
           <input type="text" id="empIBAN" placeholder="IBAN">
-          <div class="upload-box"><input type="file" id="empLogo" accept="image/*"></div>
+          <div class="upload-box">
+            <label>Logo:</label>
+            <input type="file" id="empLogo" accept="image/*">
+          </div>
         </div>
         <input type="hidden" id="empEditIndex" value="-1">
         <button type="button" id="btnGuardarEmpresa" class="btn-main">Guardar Empresa</button>
@@ -45,7 +55,10 @@
   </section>
 
   <section id="pantallaClientes" class="pantalla">
-    <div class="cabecera-seccion"><h2>Clientes</h2><button id="btnNuevoCliente" class="btn-main-short">+ Añadir</button></div>
+    <div class="cabecera-seccion">
+      <h2>Clientes</h2>
+      <button id="btnNuevoCliente" class="btn-main-short">+ Añadir</button>
+    </div>
     <div id="contenedorFormCliente" style="display: none;">
       <form id="formcliente" class="formulario-card">
         <button type="button" class="btn-cerrar-esquina" onclick="alternarVista('Cliente', false)">X</button>
@@ -70,17 +83,20 @@
   </section>
 
   <section id="pantallaPresupuestos" class="pantalla">
-    <div class="cabecera-seccion"><h2>Presupuestos</h2><button id="btnAbrirFormPresupuesto" class="btn-main-short">+ Nuevo</button></div>
+    <div class="cabecera-seccion">
+      <h2>Presupuestos</h2>
+      <button id="btnAbrirFormPresupuesto" class="btn-main-short">+ Nuevo</button>
+    </div>
     <div id="contenedorFormPresupuesto" style="display: none;">
       <div class="formulario-card">
         <button type="button" class="btn-cerrar-esquina" id="btnCerrarPresupuesto">X</button>
-        <h3 id="tituloFormPresupuesto">Gestión de Presupuesto</h3>
+        <h3>Gestión de Presupuesto</h3>
         <input type="text" id="preNombre" placeholder="Nombre Presupuesto" style="width:100%; margin-bottom:10px;">
         <div class="grid-form">
           <select id="preEmpresaSeleccionada"></select>
           <select id="preClienteSeleccionado"></select>
         </div>
-        <div class="zona-subform" style="border:1px solid #ddd; padding:10px; border-radius:8px;">
+        <div class="zona-subform" style="border:1px solid #ddd; padding:15px; border-radius:8px;">
           <h4>Añadir Concepto</h4>
           <div class="grid-form">
             <input type="text" id="conDescripcion" placeholder="Descripción">
@@ -90,17 +106,29 @@
           </div>
           <button type="button" id="btnAgregarConcepto" class="btn-main-short">Añadir Concepto</button>
         </div>
-        <table style="width:100%; margin-top:10px; font-size:0.9rem;">
-          <thead><tr><th>Desc.</th><th>Total</th><th>Acción</th></tr></thead>
+        <table style="width:100%; margin-top:15px; border-collapse: collapse;">
+          <thead><tr style="border-bottom:1px solid #eee"><th>Desc.</th><th>Total</th><th>Acción</th></tr></thead>
           <tbody id="bodyConceptosTemporal"></tbody>
         </table>
-        <button type="button" id="btnGuardarPresupuestoFinal" class="btn-main" style="margin-top:10px;">Guardar Presupuesto</button>
+        <button type="button" id="btnGuardarPresupuestoFinal" class="btn-main" style="margin-top:20px;">Guardar Presupuesto</button>
       </div>
     </div>
     <ul id="listaPresupuestos"></ul>
   </section>
 
-  <section id="pantallaFacturas" class="pantalla"><ul id="listaFacturas"></ul></section>
+  <section id="pantallaFacturas" class="pantalla">
+    <h2>Facturas Emitidas</h2>
+    <ul id="listaFacturas"></ul>
+  </section>
+
+  <section id="pantallaAjustes" class="pantalla">
+    <h2>Configuración</h2>
+    <div class="formulario-card">
+      <label>Color Corporativo: <input type="color" id="ajusteColor"></label>
+      <label>IVA por defecto (%): <input type="number" id="ajusteIVA"></label>
+      <button id="btnGuardarAjustes" class="btn-main">Guardar Ajustes</button>
+    </div>
+  </section>
 
   <div id="modalOpcionesFactura" class="modal">
     <div class="modal-content">
