@@ -144,8 +144,19 @@ function actualizarListaEmpresas() {
 
 function cargarEmpresa(i) {
     const e = empresas[i];
+    document.getElementById('tituloFormEmpresa').textContent = "Editar Empresa";
+    
     document.getElementById('empNombre').value = sano(e.nombre);
     document.getElementById('empCIF').value = sano(e.cif);
+    document.getElementById('empCalle').value = sano(e.calle);
+    document.getElementById('empNumero').value = sano(e.numero);
+    document.getElementById('empCP').value = sano(e.cp);
+    document.getElementById('empLocalidad').value = sano(e.localidad);
+    document.getElementById('empProvincia').value = sano(e.provincia);
+    document.getElementById('empTelefono').value = sano(e.telefono);
+    document.getElementById('empEmail').value = sano(e.email);
+    document.getElementById('empIBAN').value = sano(e.iban);
+    
     document.getElementById('empEditIndex').value = i;
     alternarVista('Empresa', true);
 }
@@ -186,7 +197,19 @@ function actualizarListaClientes() {
 
 function cargarCliente(i) {
     const c = clientes[i];
+    document.getElementById('tituloFormCliente').textContent = "Editar Cliente";
+    
     document.getElementById('cliNombre').value = sano(c.nombre);
+    document.getElementById('cliApellidos').value = sano(c.apellidos);
+    document.getElementById('cliCIF').value = sano(c.cif);
+    document.getElementById('cliCalle').value = sano(c.calle);
+    document.getElementById('cliNumero').value = sano(c.numero);
+    document.getElementById('cliCP').value = sano(c.cp);
+    document.getElementById('cliLocalidad').value = sano(c.localidad);
+    document.getElementById('cliProvincia').value = sano(c.provincia);
+    document.getElementById('cliTelefono').value = sano(c.telefono);
+    document.getElementById('cliEmail').value = sano(c.email);
+    
     document.getElementById('cliEditIndex').value = i;
     alternarVista('Cliente', true);
 }
