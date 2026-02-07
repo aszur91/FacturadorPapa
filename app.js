@@ -347,7 +347,10 @@ function actualizarListaFacturas() {
             <span><strong>#${f.numero}</strong> - ${sano(f.nombre)} (${f.estado})</span>
             <div>
                 <button onclick="verPDF(${i})" class="btn-main-short">PDF</button>
-                ${f.estado === 'Pendiente' ? `<button onclick="marcarCobrada(${i})" style="background:green; color:white; border:none; padding:5px; border-radius:4px;">Cobrada</button>` : ''}
+                ${f.estado === 'Pendiente' 
+                    ? `<button onclick="marcarCobrada(${i})" style="background:#e67e22; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Marcar Cobrada</button>` 
+                    : `<span style="color:green; font-weight:bold; margin-right:5px;">✓ Cobrada</span>`
+                }
                 <button onclick="borrarFactura(${i})" class="btn-danger">X</button>
             </div>
         </li>
@@ -396,59 +399,132 @@ function verPDF(idx) {
 }
 
 document.getElementById('btnConfirmarPDF').onclick = () => {
-    const f = facturaParaExportar;
+    const f = facturaParaExportar; // Objeto de la factura seleccionada
+    if (!f) return;
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
+    
+    // Recuperamos los datos de la empresa y cliente vinculados
     const emp = empresas[f.empresa];
     const cli = clientes[f.cliente];
 
-    // Estética Encabezado
-    doc.setFontSize(20); doc.setTextColor(ajustes.colorPrincipal);
-    doc.text(sano(emp.nombre).toUpperCase(), 14, 22);
+    // 1. Encabezado y Logo
+    if (emp.logo) {
+        doc.addImage(emp.logo, 'PNG', 14, 10, 30, 30);
+    }
     
-    doc.setFontSize(10); doc.setTextColor(80);
-    doc.text([`CIF: ${sano(emp.cif)}`, `${sano(emp.calle)} ${sano(emp.numero)}`, `${sano(emp.cp)} ${sano(emp.localidad)}`], 14, 30);
-
-    doc.setFillColor(245); doc.rect(120, 15, 75, 30, 'F');
-    doc.setTextColor(0); doc.setFont(undefined, 'bold'); doc.text("CLIENTE:", 125, 22);
+    doc.setFontSize(20); 
+    doc.setTextColor(ajustes.colorPrincipal);
+    doc.setFont(undefined, 'bold');
+    doc.text(sano(emp.nombre).toUpperCase(), 14, 45);
+    
+    doc.setFontSize(9); 
+    doc.setTextColor(80);
     doc.setFont(undefined, 'normal');
-    doc.text([`${sano(cli.nombre)} ${sano(cli.apellidos)}`, `CIF/NIF: ${sano(cli.cif)}`, `${sano(cli.calle)}, ${sano(cli.numero)}`, `${sano(cli.cp)} ${sano(cli.localidad)}`], 125, 28);
+    doc.text([
+        `CIF: ${sano(emp.cif)}`,
+        `${sano(emp.calle)} ${sano(emp.numero)}`,
+        `${sano(emp.cp)} ${sano(emp.localidad)} (${sano(emp.provincia)})`,
+        `Email: ${sano(emp.email)}`
+    ], 14, 52);
 
-    doc.setDrawColor(ajustes.colorPrincipal); doc.line(14, 50, 196, 50);
-    doc.text(`FACTURA Nº: ${f.numero} | FECHA: ${f.fecha}`, 14, 58);
+    // 2. Cuadro del Cliente (Derecha)
+    doc.setFillColor(245, 245, 245);
+    doc.rect(120, 40, 76, 35, 'F');
+    doc.setTextColor(0);
+    doc.setFont(undefined, 'bold');
+    doc.text("CLIENTE:", 125, 48);
+    doc.setFont(undefined, 'normal');
+    doc.text([
+        `${sano(cli.nombre)} ${sano(cli.apellidos)}`,
+        `NIF/CIF: ${sano(cli.cif)}`,
+        `${sano(cli.calle)} ${sano(cli.numero)}`,
+        `${sano(cli.cp)} ${sano(cli.localidad)}`
+    ], 125, 54);
 
-    // Tabla
-    let y = 80, b = 0, iT = 0;
-    doc.setFillColor(ajustes.colorPrincipal); doc.setTextColor(255);
-    doc.rect(14, y-6, 182, 8, 'F');
-    doc.text("CONCEPTO", 16, y); doc.text("TOTAL", 175, y);
+    // 3. Datos del Documento
+    doc.setDrawColor(ajustes.colorPrincipal);
+    doc.line(14, 85, 196, 85);
+    doc.setFontSize(11);
+    doc.text(`FACTURA Nº: ${f.numero} | Proyecto: ${sano(f.nombre)}`, 14, 92);
+    doc.text(`FECHA: ${f.fecha}`, 150, 92);
 
-    y += 10; doc.setTextColor(0);
+    // 4. Tabla de Conceptos
+    let y = 100;
+    doc.setFillColor(ajustes.colorPrincipal);
+    doc.rect(14, y, 182, 8, 'F');
+    doc.setTextColor(255);
+    doc.setFont(undefined, 'bold');
+    doc.text("CONCEPTO", 16, y + 6);
+    doc.text("TOTAL", 175, y + 6);
+
+    y += 15;
+    doc.setTextColor(0);
+    doc.setFont(undefined, 'normal');
+    
+    let baseImponible = 0;
+    let totalIVA = 0;
+
     f.lineas.forEach(l => {
-        const t = l.cantidad * l.precio;
-        b += t; iT += t * (l.iva / 100);
+        const subtotalLinea = l.cantidad * l.precio;
+        const ivaLinea = subtotalLinea * (l.iva / 100);
+        baseImponible += subtotalLinea;
+        totalIVA += ivaLinea;
+
         doc.text(`${sano(l.concepto)} (x${l.cantidad})`, 16, y);
-        doc.text(`${t.toFixed(2)}€`, 175, y);
+        doc.text(`${subtotalLinea.toFixed(2)}€`, 190, y, { align: 'right' });
         y += 8;
     });
 
-    // Totales
-    y += 10; doc.line(130, y, 196, y);
-    y += 7; doc.text(`BASE IMPONIBLE:`, 130, y); doc.text(`${b.toFixed(2)}€`, 175, y);
-    y += 7; doc.text(`IVA (${ajustes.ivaDefault}%):`, 130, y); doc.text(`${iT.toFixed(2)}€`, 175, y);
-    y += 10; doc.setFontSize(12); doc.setFont(undefined, 'bold');
-    doc.text(`TOTAL FACTURA:`, 130, y); doc.text(`${(b + iT).toFixed(2)}€`, 175, y);
+    // 5. Totales (Base e Impuestos)
+    y += 10;
+    doc.line(130, y, 196, y);
+    y += 8;
+    doc.setFontSize(10);
+    doc.text("Base Imponible:", 130, y);
+    doc.text(`${baseImponible.toFixed(2)}€`, 190, y, { align: 'right' });
+    y += 6;
+    doc.text(`IVA (${ajustes.ivaDefault}%):`, 130, y);
+    doc.text(`${totalIVA.toFixed(2)}€`, 190, y, { align: 'right' });
+    y += 10;
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.text("TOTAL FACTURA:", 130, y);
+    doc.text(`${(baseImponible + totalIVA).toFixed(2)}€`, 190, y, { align: 'right' });
 
-    // Pago
-    y = 260; doc.setFontSize(10); doc.setFont(undefined, 'normal');
-    doc.text(`MÉTODO DE PAGO: ${sano(f.metodoPago).toUpperCase()}`, 14, y);
-    if(f.metodoPago === 'transferencia') doc.text(`IBAN: ${sano(emp.iban)}`, 14, y+6);
-    if(f.metodoPago === 'bizum') doc.text(`TELÉFONO BIZUM: ${sano(emp.telefono)}`, 14, y+6);
-    doc.text(`VENCIMIENTO: ${sano(f.plazoPago)}`, 14, y+12);
+    // 6. Pie de Página: Datos de Pago (IBAN o Teléfono)
+    y = 250; 
+    doc.setFontSize(10); 
+    doc.setDrawColor(200);
+    doc.line(14, y - 5, 196, y - 5); // Línea decorativa superior
+    
+    doc.setFont(undefined, 'bold');
+    doc.text("INFORMACIÓN DE PAGO Y VENCIMIENTO:", 14, y);
+    
+    doc.setFont(undefined, 'normal');
+    y += 7;
+    doc.text(`Método seleccionado: ${sano(f.metodoPago).toUpperCase()}`, 14, y);
+    
+    y += 7;
+    if (f.metodoPago === 'transferencia') {
+        doc.text(`Por favor, realice el ingreso en el IBAN: ${sano(emp.iban)}`, 14, y);
+    } else if (f.metodoPago === 'bizum') {
+        doc.text(`Pago disponible vía Bizum al teléfono: ${sano(emp.telefono)}`, 14, y);
+    } else if (f.metodoPago === 'efectivo') {
+        doc.text(`Pago realizado/a realizar en efectivo.`, 14, y);
+    }
 
-    doc.save(`Factura_${f.numero}_${sano(f.nombre)}.pdf`);
+    y += 7;
+    doc.setFont(undefined, 'bold');
+    doc.text(`Plazo / Vencimiento: ${sano(f.plazoPago)}`, 14, y);
+
+    // 7. Guardar Archivo
+    doc.save(`Factura_${f.numero}_${sano(f.nombre).replace(/\s+/g, '_')}.pdf`);
+    
+    // Cerrar modal tras la descarga
+    document.getElementById('modalPreview').style.display = 'none';
 };
-
 // ==========================================
 // 8. AJUSTES E INICIALIZACIÓN
 // ==========================================
