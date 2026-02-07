@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>FactuApp Pro</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
@@ -23,113 +24,138 @@
 
 <main>
   <section id="pantallaEmpresas" class="pantalla active">
-  <div class="cabecera-seccion">
-    <h2>Empresas</h2>
-    <button id="btnNuevaEmpresa" class="btn-main-short">+ Añadir</button>
-  </div>
-  
-  <div id="contenedorFormEmpresa" style="display: none;">
-    <form id="formempresa" class="formulario-card">
-      <button type="button" class="btn-cerrar-esquina" onclick="alternarVista('Empresa', false)">X</button>
-      <h3 id="tituloFormEmpresa">Nueva Empresa</h3>
-      <div class="grid-form">
-        <input type="text" id="empNombre" placeholder="Nombre">
-        <input type="text" id="empCIF" placeholder="CIF/NIF">
-        <input type="text" id="empCalle" placeholder="Calle">
-        <input type="text" id="empNumero" placeholder="Número">
-        <input type="text" id="empCP" placeholder="CP">
-        <input type="text" id="empLocalidad" placeholder="Localidad">
-        <input type="text" id="empProvincia" placeholder="Provincia">
-        <input type="text" id="empTelefono" placeholder="Teléfono">
-        <input type="email" id="empEmail" placeholder="Email">
-        <input type="text" id="empIBAN" placeholder="IBAN">
-        <div class="upload-box"><input type="file" id="empLogo" accept="image/*"></div>
-      </div>
-      <input type="hidden" id="empEditIndex" value="-1">
-      <button type="button" id="btnGuardarEmpresa" class="btn-main">Guardar Empresa</button>
-    </form>
-  </div>
-  
-  <div id="contenedorListaEmpresas">
-    <ul id="listaEmpresas"></ul>
-  </div>
-</section>
+    <div id="cabeceraEmpresas" class="cabecera-seccion">
+      <h2>Mis Empresas</h2>
+      <button id="btnNuevaEmpresa" class="btn-main-short">+ Añadir</button>
+    </div>
 
-<section id="pantallaClientes" class="pantalla">
-  <div class="cabecera-seccion">
-    <h2>Clientes</h2>
-    <button id="btnNuevoCliente" class="btn-main-short">+ Añadir</button>
-  </div>
-  
-  <div id="contenedorFormCliente" style="display: none;">
-    <form id="formcliente" class="formulario-card">
-      <button type="button" class="btn-cerrar-esquina" onclick="alternarVista('Cliente', false)">X</button>
-      <h3 id="tituloFormCliente">Nuevo Cliente</h3>
-      <div class="grid-form">
-        <input type="text" id="cliNombre" placeholder="Nombre">
-        <input type="text" id="cliApellidos" placeholder="Apellidos">
-        <input type="text" id="cliCIF" placeholder="CIF/NIF">
-        <input type="text" id="cliCalle" placeholder="Calle">
-        <input type="text" id="cliNumero" placeholder="Número">
-        <input type="text" id="cliCP" placeholder="CP">
-        <input type="text" id="cliLocalidad" placeholder="Localidad">
-        <input type="text" id="cliProvincia" placeholder="Provincia">
-        <input type="text" id="cliTelefono" placeholder="Teléfono">
-        <input type="email" id="cliEmail" placeholder="Email">
-      </div>
-      <input type="hidden" id="cliEditIndex" value="-1">
-      <button type="button" id="btnGuardarCliente" class="btn-main">Guardar Cliente</button>
-    </form>
-  </div>
+    <div id="contenedorFormEmpresa" style="display: none;">
+      <form id="formempresa" class="formulario-card">
+        <button type="button" class="btn-cerrar-esquina" onclick="alternarVista('Empresa', false)">X</button>
+        <h3 id="tituloFormEmpresa">Nueva Empresa</h3>
+        <div class="grid-form">
+          <input type="text" id="empNombre" placeholder="Nombre de empresa">
+          <input type="text" id="empCIF" placeholder="CIF/NIF">
+          <input type="text" id="empCalle" placeholder="Calle">
+          <input type="text" id="empNumero" placeholder="Número">
+          <input type="text" id="empCP" placeholder="Código Postal">
+          <input type="text" id="empLocalidad" placeholder="Localidad">
+          <input type="text" id="empProvincia" placeholder="Provincia">
+          <input type="text" id="empTelefono" placeholder="Teléfono">
+          <input type="email" id="empEmail" placeholder="Email">
+          <input type="text" id="empIBAN" placeholder="IBAN">
+          <div class="upload-box">
+            <label>Logotipo:</label>
+            <input type="file" id="empLogo" accept="image/*">
+          </div>
+        </div>
+        <input type="hidden" id="empEditIndex" value="-1">
+        <button type="button" id="btnGuardarEmpresa" class="btn-main">Guardar Empresa</button>
+      </form>
+    </div>
 
-  <div id="contenedorListaClientes">
-    <ul id="listaClientes"></ul>
-  </div>
-</section>
+    <div id="contenedorListaEmpresas">
+      <ul id="listaEmpresas"></ul>
+    </div>
+  </section>
+
+  <section id="pantallaClientes" class="pantalla">
+    <div id="cabeceraClientes" class="cabecera-seccion">
+      <h2>Mis Clientes</h2>
+      <button id="btnNuevoCliente" class="btn-main-short">+ Añadir Cliente</button>
+    </div>
+
+    <div id="contenedorFormCliente" style="display: none;">
+      <form id="formcliente" class="formulario-card">
+        <button type="button" class="btn-cerrar-esquina" onclick="alternarVista('Cliente', false)">X</button>
+        <h3 id="tituloFormCliente">Nuevo Cliente</h3>
+        <div class="grid-form">
+          <input type="text" id="cliNombre" placeholder="Nombre">
+          <input type="text" id="cliApellidos" placeholder="Apellidos">
+          <input type="text" id="cliCIF" placeholder="CIF/NIF">
+          <input type="text" id="cliCalle" placeholder="Calle">
+          <input type="text" id="cliNumero" placeholder="Número">
+          <input type="text" id="cliCP" placeholder="Código Postal">
+          <input type="text" id="cliLocalidad" placeholder="Localidad">
+          <input type="text" id="cliProvincia" placeholder="Provincia">
+          <input type="text" id="cliTelefono" placeholder="Teléfono">
+          <input type="email" id="cliEmail" placeholder="Email">
+        </div>
+        <input type="hidden" id="cliEditIndex" value="-1">
+        <button type="button" id="btnGuardarCliente" class="btn-main">Guardar Cliente</button>
+      </form>
+    </div>
+
+    <div id="contenedorListaClientes">
+      <ul id="listaClientes"></ul>
+    </div>
+  </section>
+
   <section id="pantallaPresupuestos" class="pantalla">
-    <div class="cabecera-seccion">
+    <div id="cabeceraPresupuestos" class="cabecera-seccion">
       <h2>Presupuestos</h2>
       <button id="btnAbrirFormPresupuesto" class="btn-main-short">+ Nuevo</button>
     </div>
+
     <div id="contenedorFormPresupuesto" style="display: none;">
       <div class="formulario-card">
         <button type="button" class="btn-cerrar-esquina" id="btnCerrarPresupuesto">X</button>
-        <h3>Gestión de Presupuesto</h3>
-        <input type="text" id="preNombre" placeholder="Nombre Presupuesto" style="width:100%; margin-bottom:10px;">
+        <h3 id="tituloFormPresupuesto">Gestión de Presupuesto</h3>
+        
+        <input type="text" id="preNombre" placeholder="Nombre del Presupuesto (ej: Reforma)" style="width:100%; margin-bottom:15px;">
+        
         <div class="grid-form">
-          <select id="preEmpresaSeleccionada"></select>
-          <select id="preClienteSeleccionado"></select>
+          <select id="preEmpresaSeleccionada" title="Selecciona Empresa"></select>
+          <select id="preClienteSeleccionado" title="Selecciona Cliente"></select>
         </div>
-        <div class="zona-subform" style="border:1px solid #ddd; padding:15px; border-radius:8px;">
+
+        <div class="zona-subform" style="border:1px solid #ddd; padding:15px; border-radius:8px; margin-top:10px;">
           <h4>Añadir Concepto</h4>
           <div class="grid-form">
-            <input type="text" id="conDescripcion" placeholder="Descripción">
+            <input type="text" id="conDescripcion" placeholder="Descripción del trabajo">
             <input type="number" id="conCantidad" placeholder="Cant.">
             <input type="number" id="conPrecio" placeholder="Precio U.">
             <input type="number" id="conIVA" placeholder="IVA %">
           </div>
           <button type="button" id="btnAgregarConcepto" class="btn-main-short">Añadir Concepto</button>
         </div>
-        <table style="width:100%; margin-top:15px; border-collapse: collapse;">
-          <thead><tr style="border-bottom:1px solid #eee"><th>Desc.</th><th>Total</th><th>Acción</th></tr></thead>
+
+        <table style="width:100%; margin-top:20px; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 2px solid #eee; text-align: left;">
+              <th>Concepto</th>
+              <th>Total</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
           <tbody id="bodyConceptosTemporal"></tbody>
         </table>
-        <button type="button" id="btnGuardarPresupuestoFinal" class="btn-main" style="margin-top:20px;">Guardar Presupuesto</button>
+
+        <button type="button" id="btnGuardarPresupuestoFinal" class="btn-main" style="margin-top:25px;">Guardar Presupuesto</button>
       </div>
     </div>
-    <ul id="listaPresupuestos"></ul>
+
+    <div id="contenedorListaPresupuestos">
+      <ul id="listaPresupuestos"></ul>
+    </div>
   </section>
 
   <section id="pantallaFacturas" class="pantalla">
-    <h2>Facturas Emitidas</h2>
-    <ul id="listaFacturas"></ul>
+    <div class="cabecera-seccion">
+      <h2>Historial de Facturas</h2>
+    </div>
+    <div id="contenedorListaFacturas">
+      <ul id="listaFacturas"></ul>
+    </div>
   </section>
 
   <section id="pantallaAjustes" class="pantalla">
-    <h2>Configuración</h2>
+    <h2>Configuración General</h2>
     <div class="formulario-card">
-      <label>Color Corporativo: <input type="color" id="ajusteColor"></label>
-      <label>IVA por defecto (%): <input type="number" id="ajusteIVA"></label>
+      <div class="grid-form">
+        <label>Color corporativo: <input type="color" id="ajusteColor"></label>
+        <label>IVA por defecto (%): <input type="number" id="ajusteIVA"></label>
+      </div>
       <button id="btnGuardarAjustes" class="btn-main">Guardar Ajustes</button>
     </div>
   </section>
@@ -139,23 +165,28 @@
       <button class="btn-cerrar-esquina" onclick="document.getElementById('modalOpcionesFactura').style.display='none'">X</button>
       <h3>Opciones de Emisión</h3>
       <div class="grid-form">
-        <select id="facMetodoPago">
-          <option value="transferencia">Transferencia</option>
-          <option value="bizum">Bizum</option>
-          <option value="efectivo">Efectivo</option>
-        </select>
-        <input type="text" id="facPlazo" placeholder="Plazo (ej: 30 días)">
+        <label>Método de Pago:
+          <select id="facMetodoPago">
+            <option value="transferencia">Transferencia</option>
+            <option value="bizum">Bizum</option>
+            <option value="efectivo">Efectivo</option>
+          </select>
+        </label>
+        <label>Plazo:
+          <input type="text" id="facPlazo" placeholder="Ej: 30 días">
+        </label>
       </div>
-      <button id="btnConfirmarEmision" class="btn-main">Emitir Factura</button>
+      <button id="btnConfirmarEmision" class="btn-main">Generar Factura</button>
     </div>
   </div>
 
   <div id="modalPreview" class="modal">
     <div class="modal-content">
       <button class="btn-cerrar-esquina" onclick="document.getElementById('modalPreview').style.display='none'">X</button>
-      <h3>Vista Previa</h3>
-      <div id="previewContenido"></div>
-      <button id="btnConfirmarPDF" class="btn-main">Descargar PDF</button>
+      <h3>Borrador del Documento</h3>
+      <div id="previewContenido">
+        </div>
+      <button id="btnConfirmarPDF" class="btn-main" style="margin-top:20px;">Descargar PDF Profesional</button>
     </div>
   </div>
 </main>
