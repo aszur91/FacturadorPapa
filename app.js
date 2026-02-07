@@ -64,11 +64,13 @@ const toBase64 = file => new Promise((resolve, reject) => {
     reader.onerror = error => reject(error);
 });
 
-// FUNCIÓN CLAVE: Alternar entre lista y formulario
+// FUNCIÓN DE ALTERNANCIA (Corregida para tus IDs de HTML)
 function alternarVista(tipo, mostrarFormulario) {
   const contenedorForm = document.getElementById(`contenedorForm${tipo}`);
   const contenedorLista = document.getElementById(`contenedorLista${tipo}s`);
-  const btnNuevo = document.getElementById(`btnNuevo${tipo === 'Empresa' ? 'Empresa' : 'Cliente'}`);
+  // Coincidencia exacta con tus botones del HTML: btnNuevaEmpresa / btnNuevoCliente
+  const idBoton = tipo === 'Empresa' ? 'btnNuevaEmpresa' : 'btnNuevoCliente';
+  const btnNuevo = document.getElementById(idBoton);
   const tituloForm = document.getElementById(`tituloForm${tipo}`);
   const form = document.getElementById(`form${tipo.toLowerCase()}`);
 
@@ -191,7 +193,6 @@ function cargarEmpresaEnForm(i) {
   document.getElementById('empEmail').value = e.email;
   document.getElementById('empIBAN').value = e.iban;
   document.getElementById('empEditIndex').value = i;
-  
   alternarVista('Empresa', true);
 }
 
@@ -251,17 +252,14 @@ function actualizarListaClientes() {
     const li = document.createElement('li');
     li.innerHTML = `<span><strong>${c.nombre} ${c.apellidos}</strong></span>`;
     const div = document.createElement('div');
-    
     const btnEdit = document.createElement('button');
     btnEdit.textContent = 'Editar';
     btnEdit.className = 'btn-update';
     btnEdit.onclick = () => cargarClienteEnForm(i);
-
     const btnDel = document.createElement('button');
     btnDel.textContent = 'Eliminar';
     btnDel.className = 'btn-danger';
     btnDel.onclick = () => { if(confirm('¿Eliminar cliente?')) { clientes.splice(i,1); guardarLocalStorage(); actualizarListaClientes(); } };
-    
     div.append(btnEdit, btnDel);
     li.appendChild(div);
     lista.appendChild(li);
@@ -283,7 +281,6 @@ function cargarClienteEnForm(i) {
   document.getElementById('cliTelefono').value = c.telefono;
   document.getElementById('cliEmail').value = c.email;
   document.getElementById('cliEditIndex').value = i;
-
   alternarVista('Cliente', true);
 }
 
@@ -299,25 +296,20 @@ function actualizarListaPresupuestos() {
     li.innerHTML = `<div><strong>#${p.numero}</strong> - ${clientes[p.cliente]?.nombre || 'S/C'} - ${p.total.toFixed(2)}€</div>`;
     const divBtns = document.createElement('div');
     divBtns.style.display = 'flex'; divBtns.style.gap = '5px';
-
     const btnVer = document.createElement('button');
     btnVer.textContent = 'Ver/PDF';
     btnVer.style.backgroundColor = 'var(--primary-color)'; btnVer.style.color = 'white';
     btnVer.onclick = () => previsualizarFactura(p);
-
     const btnEdit = document.createElement('button');
     btnEdit.textContent = 'Editar';
     btnEdit.style.backgroundColor = '#ff9500'; btnEdit.style.color = 'white';
     btnEdit.onclick = () => abrirEdicionPresupuesto(index);
-
     const btnFact = document.createElement('button');
     btnFact.textContent = 'Facturar';
     btnFact.onclick = () => convertirAFactura(index);
-
     const btnDel = document.createElement('button');
     btnDel.textContent = 'X'; btnDel.className = 'btn-danger';
     btnDel.onclick = () => { if (confirm('¿Eliminar?')) { presupuestos.splice(index, 1); guardarLocalStorage(); actualizarListaPresupuestos(); } };
-
     divBtns.append(btnVer, btnEdit, btnFact, btnDel);
     li.appendChild(divBtns);
     lista.appendChild(li);
@@ -418,7 +410,6 @@ function previsualizarFactura(f) {
   modal.style.display = "block";
 }
 
-// Lógica de exportación PDF (reducida para brevedad, mantener tu función completa)
 function exportarPDF(f) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
@@ -430,32 +421,35 @@ function exportarPDF(f) {
   doc.setFontSize(16); doc.setTextColor(ajustes.colorPrincipal);
   doc.text(emp.nombre.toUpperCase(), 14, 45);
   doc.setFontSize(9); doc.setTextColor(80);
-  doc.text([`CIF: ${emp.cif}`, `${emp.calle}, ${emp.numero}`, `${emp.cp} - ${emp.localidad}`], 14, 52);
+  doc.text([`CIF: ${emp.cif}`, `${emp.calle}, ${emp.numero}, ${emp.puerta}`, `${emp.cp} - ${emp.localidad} (${emp.provincia})`, `Tlf: ${emp.telefono} | Email: ${emp.email}`], 14, 52);
 
   doc.setFillColor(245, 245, 245); doc.rect(110, 40, 86, 35, 'F');
-  doc.setTextColor(0); doc.text(`CLIENTE: ${cli.nombre} ${cli.apellidos}`, 115, 48);
-  doc.text([`CIF/NIF: ${cli.cif}`, `${cli.calle}, ${cli.numero}`, `${cli.cp} - ${cli.localidad}`], 115, 54);
+  doc.setTextColor(0); doc.setFont(undefined, 'bold'); doc.text("CLIENTE:", 115, 48);
+  doc.setFont(undefined, 'normal');
+  doc.text([`${cli.nombre} ${cli.apellidos}`, `CIF/NIF: ${cli.cif}`, `${cli.calle}, ${cli.numero}, ${cli.puerta}`, `${cli.cp} - ${cli.localidad}`, `${cli.provincia}`], 115, 54);
 
-  doc.line(14, 85, 196, 85);
+  doc.setDrawColor(ajustes.colorPrincipal); doc.line(14, 85, 196, 85);
   doc.text(`FACTURA Nº: ${f.numero} | FECHA: ${f.fecha}`, 14, 92);
 
-  let y = 105;
+  let y = 105, subtotal = 0, totalIVA = 0;
   f.lineas.forEach(l => {
+    const t = l.cantidad * l.precio;
+    subtotal += t; totalIVA += t * (l.iva / 100);
     doc.text(`${l.concepto} x${l.cantidad}`, 16, y);
-    doc.text(`${(l.cantidad * l.precio).toFixed(2)}€`, 170, y);
+    doc.text(`${t.toFixed(2)}€`, 170, y);
     y += 8;
   });
-  doc.text(`TOTAL: ${f.total.toFixed(2)}€`, 150, y + 10);
-  doc.text(`IBAN: ${emp.iban}`, 14, 260);
-  doc.save(`Factura_${f.numero}.pdf`);
+  doc.setFont(undefined, 'bold');
+  doc.text(`TOTAL FACTURA: ${(subtotal + totalIVA).toFixed(2)}€`, 130, y + 10);
+  doc.setFontSize(10); doc.text(`IBAN DE PAGO: ${emp.iban}`, 14, 260);
+  doc.save(`Factura_${f.numero}_${emp.nombre}.pdf`);
 }
 
 // ==========================================
-// 8. INICIALIZACIÓN Y EVENTOS FINALES
+// 8. INICIALIZACIÓN
 // ==========================================
 if (closeBtn) closeBtn.onclick = () => modal.style.display = "none";
 window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; };
-
 document.getElementById('btnConfirmarPDF').onclick = () => {
   if (facturaParaExportar) exportarPDF(facturaParaExportar);
   modal.style.display = "none";
