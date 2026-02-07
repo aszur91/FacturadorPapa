@@ -235,8 +235,8 @@ function renderConceptosTemporales() {
             <td>${sano(c.concepto)}</td>
             <td>${(c.cantidad * c.precio).toFixed(2)}€</td>
             <td>
-                <button onclick="editarConceptoTemp(${i})" style="color:blue; border:none; background:none; cursor:pointer;">Edit</button>
-                <button onclick="eliminarConceptoTemp(${i})" style="color:red; border:none; background:none; cursor:pointer;">Elim</button>
+                <button onclick="editarConceptoTemp(${i})" style="color:blue; border:none; background:none; cursor:pointer;">Editar</button>
+                <button onclick="eliminarConceptoTemp(${i})" style="color:red; border:none; background:none; cursor:pointer;">Eliminar</button>
             </td>
         </tr>
     `).join('');
