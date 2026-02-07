@@ -517,7 +517,7 @@ document.getElementById('btnConfirmarPDF').onclick = () => {
 
     y += 7;
     doc.setFont(undefined, 'bold');
-    doc.text(`Plazo / Vencimiento: ${sano(f.plazoPago)}`, 14, y);
+    doc.text(`Plazo / Vencimiento: ${sano(f.plazoPago)} días`, 14, y);
 
     // 7. Guardar Archivo
     doc.save(`Factura_${f.numero}_${sano(f.nombre).replace(/\s+/g, '_')}.pdf`);
