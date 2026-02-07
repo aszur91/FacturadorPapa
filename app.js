@@ -542,3 +542,19 @@ document.addEventListener('DOMContentLoaded', () => {
     actualizarListaPresupuestos();
     actualizarListaFacturas();
 });
+
+// Detectar actualizaciones del Service Worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(registration => {
+        registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    if (confirm("Hay una nueva versión disponible. ¿Deseas actualizar?")) {
+                        window.location.reload();
+                    }
+                }
+            });
+        });
+    });
+}
