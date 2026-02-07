@@ -44,5 +44,44 @@ li { background: white; padding: 12px; margin-bottom: 10px; border-radius: 8px; 
 
 .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
 .modal-content { background: white; margin: 15% auto; padding: 20px; width: 90%; max-width: 500px; border-radius: 12px; }
+/* Permitir posicionamiento relativo para que el botón 'X' se ubique respecto al formulario */
+.formulario-card {
+  position: relative; 
+  background: white;
+  padding: 25px; /* Aumentamos un poco el padding superior */
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
 
+/* Estilo para el botón cerrar en la esquina */
+.btn-cerrar-esquina {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #ff3b30;
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+
+.btn-cerrar-esquina:hover {
+  transform: scale(1.1);
+  background: #d32f2f;
+}
+
+/* Quitamos el margen del título para que no empuje el botón */
+.form-header h3 {
+  margin: 0;
+  padding-right: 40px; /* Espacio para que el texto no pise la X */
+}
 @media (max-width: 500px) { .grid-form { grid-template-columns: 1fr; } }
